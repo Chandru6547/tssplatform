@@ -2,59 +2,108 @@ const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const { normalize } = require("../utils/normalize");
-const { log } = require("console");
 
-const TEMP_DIR = path.join(__dirname, "..", "temp");
+/* ---------------- TEMP DIR ---------------- */
+const TEMP_DIR = path.join(process.cwd(), "temp");
 if (!fs.existsSync(TEMP_DIR)) fs.mkdirSync(TEMP_DIR);
 
-/* ---------- RUN DOCKER ---------- */
-function runDocker(cmd, input) {
+/* ---------------- RUN COMMAND ---------------- */
+function runCommand(command, input, cwd) {
   return new Promise((resolve, reject) => {
-    const child = exec(cmd, { timeout: 5000 }, (err, stdout, stderr) => {
-      if (err) {
-        if (err.killed) {
-          reject({ type: "TLE", message: "Time Limit Exceeded" });
+    const child = exec(
+      command,
+      {
+        cwd,
+        timeout: 3000,                 // ⏱️ TLE protection
+        maxBuffer: 1024 * 1024         // 💾 output limit
+      },
+      (err, stdout, stderr) => {
+        if (err) {
+          if (err.killed) {
+            reject({ type: "TLE", message: "Time Limit Exceeded" });
+          } else {
+            reject({ type: "RE", message: stderr || err.message });
+          }
         } else {
-          reject({ type: "RE", message: stderr || err.message });
+          resolve(stdout);
         }
-      } else {
-        resolve(stdout);
       }
-    });
+    );
 
     if (input) child.stdin.write(input);
     child.stdin.end();
   });
 }
 
-/* ---------- MAIN EXECUTOR ---------- */
+/* ---------------- MAIN EXECUTOR ---------------- */
 async function executeCode(language, code, testcases) {
   const jobId = Date.now().toString();
   const jobDir = path.join(TEMP_DIR, jobId);
   fs.mkdirSync(jobDir);
 
-  let fileName;
+  let fileName, compileCmd, runCmd;
+
   switch (language) {
-    case "c": fileName = "main.c"; break;
-    case "cpp": fileName = "main.cpp"; break;
-    case "python": fileName = "main.py"; break;
-    case "java": fileName = "Main.java"; break;
-    default: throw new Error("Unsupported language");
+    case "c":
+      fileName = "main.c";
+      compileCmd = "gcc main.c -o main";
+      runCmd = "./main";
+      break;
+
+    case "cpp":
+      fileName = "main.cpp";
+      compileCmd = "g++ main.cpp -o main";
+      runCmd = "./main";
+      break;
+
+    case "python":
+      fileName = "main.py";
+      compileCmd = null;
+      runCmd = "python3 main.py";
+      break;
+
+    case "java":
+      fileName = "Main.java";
+      compileCmd = "javac Main.java";
+      runCmd = "java Main";
+      break;
+
+    default:
+      throw new Error("Unsupported language");
   }
 
+  /* ---------- WRITE CODE FILE ---------- */
   fs.writeFileSync(path.join(jobDir, fileName), code);
+
+  /* ---------- COMPILE (IF NEEDED) ---------- */
+  try {
+    if (compileCmd) {
+      await runCommand(compileCmd, null, jobDir);
+    }
+  } catch (err) {
+    fs.rmSync(jobDir, { recursive: true, force: true });
+    return {
+      verdict: "CE",
+      passed: 0,
+      total: testcases.length,
+      results: [{
+        input: "",
+        expected: "",
+        actual: err.message,
+        status: "CE"
+      }]
+    };
+  }
 
   let passed = 0;
   const results = [];
 
+  /* ---------- RUN TEST CASES ---------- */
   for (let i = 0; i < testcases.length; i++) {
     const tc = testcases[i];
 
-    const dockerCmd =
-      `docker run --rm -i -v "${jobDir}:/workspace" code-runner ${language}`;
-
     try {
-      const actualOutput = await runDocker(dockerCmd, tc.input);
+      const actualOutput = await runCommand(runCmd, tc.input, jobDir);
 
       const normActual = normalize(actualOutput);
       const normExpected = normalize(tc.output);
@@ -69,20 +118,21 @@ async function executeCode(language, code, testcases) {
         status
       });
 
-      // ❌ Stop on first failure
+      // Stop on first failure (as per your logic)
       if (status === "FAIL") break;
 
-    } catch (error) {
+    } catch (err) {
       results.push({
         input: tc.input,
         expected: tc.output,
-        actual: error.message || "",
-        status: error.type || "RE"
+        actual: err.message || "",
+        status: err.type || "RE"
       });
       break;
     }
   }
 
+  /* ---------- CLEANUP ---------- */
   fs.rmSync(jobDir, { recursive: true, force: true });
 
   return {
@@ -92,6 +142,5 @@ async function executeCode(language, code, testcases) {
     results
   };
 }
-
 
 module.exports = { executeCode };
