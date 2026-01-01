@@ -112,6 +112,9 @@ async function getStudentDetails(studentId) {
   return student;
 }
 
+
+
 module.exports = {
-  runCodeController
+  runCodeController,
+  getStudentDetails
 };

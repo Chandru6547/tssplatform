@@ -20,6 +20,8 @@ const yearController = require("./controllers/year.controller");
 const batchController = require("./controllers/batch.controller");
 const studentController = require("./controllers/student.controller");
 const { getSubmissionsByBatch } = require("./controllers/submissionController");
+const mcqRoutes = require("./routes/mcq.routes");
+const mcqSubmissionRoutes = require("./routes/mcqSubmission.routes");
 require("dotenv").config();
 
 const app = express();
@@ -30,7 +32,8 @@ app.use(cors());
 connectDB();
 
 app.use("/api/submissions", require("./routes/submissionRoutes"));
-
+app.use("/api/mcqs", mcqRoutes);
+app.use("/api/mcq-submissions", mcqSubmissionRoutes);
 /* ===================== AUTH ===================== */
 app.use("/api/auth", authRoutes);
 
@@ -117,6 +120,7 @@ app.post(
    authMiddleware(["admin", "student"]),
   categoryController.createCategory
 );
+
 
 // Get Categories by Course
 app.get(
