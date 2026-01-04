@@ -23,7 +23,40 @@ exports.getQuestionById = async (req, res) => {
   res.json(question);
 };
 
+exports.getQuestionByIdforAdmin = async (req, res) => {
+  const question = await Question.findById(req.params.id)
+  res.json(question);
+};
+
 exports.getQuestionTitleById = async (questionId) => {
   const question = await Question.findById(questionId).select("title");
   return question ? question.title : null;
 }
+// UPDATE QUESTION
+exports.updateQuestion = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const updatedQuestion = await Question.findByIdAndUpdate(
+      id,
+      req.body,
+      {
+        new: true,          // return updated document
+        runValidators: true // enforce schema validation
+      }
+    );
+
+    if (!updatedQuestion) {
+      return res.status(404).json({
+        message: "Question not found"
+      });
+    }
+
+    res.json(updatedQuestion);
+  } catch (err) {
+    res.status(500).json({
+      error: err.message
+    });
+  }
+};
+

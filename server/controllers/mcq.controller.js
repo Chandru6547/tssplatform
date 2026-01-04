@@ -54,6 +54,15 @@ exports.getMCQByID = async (req, res) => {
   }
 };
 
+exports.getMCQByIDHelper = async (id) => {
+    try {
+    const mcq = await MCQ.findById(id);
+    res.json(mcq);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
 /* ---------- GET MCQS BY CATEGORY ---------- */
 exports.getMCQsByCategory = async (req, res) => {
   try {

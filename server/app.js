@@ -22,6 +22,8 @@ const studentController = require("./controllers/student.controller");
 const { getSubmissionsByBatch } = require("./controllers/submissionController");
 const mcqRoutes = require("./routes/mcq.routes");
 const mcqSubmissionRoutes = require("./routes/mcqSubmission.routes");
+const addCourse = require("./controllers/userCourse.controller").addCourse;
+const addMcq = require("./controllers/userMcq.controller").addMcq;
 require("dotenv").config();
 
 const app = express();
@@ -72,6 +74,16 @@ app.get(
 app.post(
   "/batch",
   batchController.createBatch
+);
+
+app.post(
+  "/addCourse",
+  addCourse
+);
+
+app.post(
+  "/addMcq",
+  addMcq
 );
 
 app.get(
@@ -151,6 +163,9 @@ app.get(
   questionController.getQuestionById
 );
 
+app.get("/questionsforadmin/:id", questionController.getQuestionByIdforAdmin);
+
+app.put("/questions/:id", questionController.updateQuestion);
 app.get("/", (req, res) => {
   res.send("Judge API is running...");
 });

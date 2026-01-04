@@ -89,3 +89,103 @@ exports.getMCQSubmissionsByMCQ = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+exports.getMCQSubmissionbyBatch = async (req, res) => {
+  const { college, year, batch, mcqId } = req.body;
+  console.log(req.body);
+  
+  if (!college || !year || !batch) {
+    return res.status(400).json({
+      message: "college, year, and batch are required"
+    });
+  }
+
+  try {
+    /* ---------- 1️⃣ FETCH SUBMISSIONS ---------- */
+    const allSubmissions = await MCQSubmission.find({
+      college,
+      year,
+      batch,
+      mcqId
+    }).lean();
+
+    if (allSubmissions.length === 0) {
+      return res.json([]);
+    }
+
+    /* ---------- 2️⃣ FILTER TO MAX SCORE PER STUDENT PER MCQ ---------- */
+    const studentMcqMaxSubmissions = {};
+    allSubmissions.forEach(sub => {
+      const key = `${sub.studentId}-${sub.mcqId}`;
+      if (!studentMcqMaxSubmissions[key] || sub.score > studentMcqMaxSubmissions[key].score) {
+        studentMcqMaxSubmissions[key] = sub;
+      }
+    });
+    const submissions = Object.values(studentMcqMaxSubmissions);
+
+    /* ---------- 2️⃣ FETCH STUDENTS ---------- */
+    const studentIds = [
+      ...new Set(submissions.map(s => s.studentId))
+    ];
+
+    const students = await User.find({
+      _id: { $in: studentIds }
+    })
+      .select("email name")
+      .lean();
+
+    const studentMap = {};
+    students.forEach(s => {
+      studentMap[s._id.toString()] = s;
+    });
+
+    /* ---------- 3️⃣ CALCULATE MCQ ATTEMPTED COUNT (DISTINCT) ---------- */
+    const attemptedMap = {};
+
+    submissions.forEach(sub => {
+      if (!attemptedMap[sub.studentId]) {
+        attemptedMap[sub.studentId] = new Set();
+      }
+      attemptedMap[sub.studentId].add(sub.mcqId);
+    });
+
+    // Convert Set size to number
+    const attemptedCountMap = {};
+    Object.keys(attemptedMap).forEach(studentId => {
+      attemptedCountMap[studentId] = attemptedMap[studentId].size;
+    });
+
+    /* ---------- 4️⃣ FETCH MCQ TOPICS ---------- */
+    const mcqTopicMap = {};
+
+    await Promise.all(
+      submissions.map(async sub => {
+        if (!mcqTopicMap[sub.mcqId]) {
+          const mcq = await MCQ.findById(sub.mcqId).select("topic category");
+          mcqTopicMap[sub.mcqId] = mcq ? mcq.topic : "Unknown MCQ";
+        }
+      })
+    );
+
+    /* ---------- 5️⃣ ENRICH SUBMISSIONS ---------- */
+    const enrichedSubmissions = submissions.map(sub => ({
+      ...sub,
+
+      // student details
+      student: studentMap[sub.studentId] || null,
+
+      // mcq topic
+      mcqTopic: mcqTopicMap[sub.mcqId] || "Unknown MCQ",
+
+      // ✅ NEW: attempted count
+      studentAttemptedCount: attemptedCountMap[sub.studentId] || 0
+    }));
+
+    res.json(enrichedSubmissions);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

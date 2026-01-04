@@ -3,7 +3,7 @@ const router = express.Router();
 const mcqController = require("../controllers/mcq.controller");
 
 router.post("/createmcq", mcqController.createMCQ);
-router.get("/getallmcq", mcqController.getAllMCQs);
+router.post("/getallmcq", mcqController.getAllMCQs);
 router.get("/category", mcqController.getMCQsByCategory);
 router.get("/topic", mcqController.getMCQsByTopic);
 router.delete("/:id", mcqController.deleteMCQ);
