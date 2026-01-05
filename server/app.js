@@ -24,6 +24,7 @@ const mcqRoutes = require("./routes/mcq.routes");
 const mcqSubmissionRoutes = require("./routes/mcqSubmission.routes");
 const addCourse = require("./controllers/userCourse.controller").addCourse;
 const addMcq = require("./controllers/userMcq.controller").addMcq;
+const getAllMCQForAdmin =require("./controllers/mcq.controller").getAllMCQsforAdmin;
 require("dotenv").config();
 
 const app = express();
@@ -61,7 +62,7 @@ app.post(
   yearController.createYear
 );
 
-app.get(
+app.get( 
   "/year/get",
   yearController.getYears
 );
@@ -92,7 +93,7 @@ app.get(
 );
 
 app.get(
-  "/batch/get-by-year-and-campus",
+  "/batch/get-by-campus-year",
   batchController.getBatchesByYearAndCampus
 );
 
@@ -169,6 +170,8 @@ app.put("/questions/:id", questionController.updateQuestion);
 app.get("/", (req, res) => {
   res.send("Judge API is running...");
 });
+
+app.get("/getAllMCQForAdmin", getAllMCQForAdmin)
 
 
 /* ===================== SERVER ===================== */

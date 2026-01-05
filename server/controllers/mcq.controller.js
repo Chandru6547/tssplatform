@@ -15,8 +15,21 @@ exports.createMCQ = async (req, res) => {
 exports.getAllMCQs = async (req, res) => {
   try {
     const mcqs = await MCQ.find();
+    console.log(mcqs);
     res.json(mcqs);
   } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getAllMCQsforAdmin = async (req, res) => {
+  try {
+    const mcqs = await MCQ.find();
+    console.log(mcqs);
+    res.send(mcqs);
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 };
@@ -81,6 +94,8 @@ exports.getMCQsByTopic = async (req, res) => {
     const mcqs = await MCQ.find({ topic });
     res.json(mcqs);
   } catch (err) {
+    console.log(err);
+    
     res.status(500).json({ error: err.message });
   }
 };

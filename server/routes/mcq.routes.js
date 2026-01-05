@@ -4,6 +4,7 @@ const mcqController = require("../controllers/mcq.controller");
 
 router.post("/createmcq", mcqController.createMCQ);
 router.post("/getallmcq", mcqController.getAllMCQs);
+router.get("/getallmcq", mcqController.getAllMCQs);
 router.get("/category", mcqController.getMCQsByCategory);
 router.get("/topic", mcqController.getMCQsByTopic);
 router.delete("/:id", mcqController.deleteMCQ);

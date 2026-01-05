@@ -16,6 +16,8 @@ const userSchema = new mongoose.Schema({
   batch : String,
   course: [],
   mcqs: [],
+  regNo: String,
+  phNo: String,
   role: {
     type: String,
     enum: ["admin", "student", "user"],
