@@ -21,3 +21,20 @@ module.exports.getStudentName = async (studentId) => {
     const student = await User.findById(studentId).select("name");
     return student ? student.name : null;
 };
+
+module.exports.getStudentsByCollegeYearBatch = async (req, res) => {
+  const { college, year, batch } = req.query;
+
+  try {
+    const query = { role: "student" };
+    if (college) query.college = college;
+    if (year) query.year = parseInt(year);
+    if (batch) query.batch = batch;
+
+    const students = await User.find(query).select("-password");
+    res.json(students);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+}

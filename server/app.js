@@ -11,6 +11,7 @@ const categoryController = require("./controllers/category.controller");
 // Routes
 const adminRoutes = require("./routes/admin.routes");
 const authRoutes = require("./routes/auth.routes");
+const studentRoutes = require("./routes/student.routes");
 
 // Auth Middleware
 const authMiddleware = require("./middleware/auth.middleware");
@@ -39,6 +40,7 @@ app.use("/api/mcqs", mcqRoutes);
 app.use("/api/mcq-submissions", mcqSubmissionRoutes);
 /* ===================== AUTH ===================== */
 app.use("/api/auth", authRoutes);
+app.use("/api/students", studentRoutes);
 
 /* ===================== JUDGE ===================== */
 app.post(
@@ -122,7 +124,7 @@ app.get(
 // Get All Courses
 app.post(
   "/courses/student",
-  authMiddleware(["admin", "student"]),
+  // authMiddleware(["admin", "student"]),
   courseController.getCourses
 );
 
