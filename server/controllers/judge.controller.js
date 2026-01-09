@@ -4,11 +4,13 @@ const Submission = require("../models/Submission");
 const Question = require("../models/Question");
 const User = require("../models/User");
 const { executeCode } = require("../services/judge.service");
+const logger = require("../utils/logger");
 
 /* ---------------------------------------------
    RUN / SUBMIT CODE CONTROLLER
 ---------------------------------------------- */
   async function runCodeController(req, res) {
+    logger.info("runCodeController API called");
     try {
       const {
         language,
@@ -20,6 +22,7 @@ const { executeCode } = require("../services/judge.service");
 
       /* ---------- BASIC VALIDATION ---------- */
       if (!language || !code) {
+        logger.error("runCodeController failed: language and code are required");
         return res.status(400).json({
           error: "language and code are required"
         });
@@ -37,6 +40,7 @@ const { executeCode } = require("../services/judge.service");
         const question = await Question.findById(questionId);
 
         if (!question) {
+          logger.error("runCodeController failed: Question not found");
           return res.status(404).json({
             error: "Question not found"
           });
@@ -48,6 +52,7 @@ const { executeCode } = require("../services/judge.service");
 
       /* ---------- RUN MODE VALIDATION ---------- */
       if (!Array.isArray(finalTestcases)) {
+        logger.error("runCodeController failed: testcases[] required");
         return res.status(400).json({
           error: "testcases[] required"
         });
@@ -81,6 +86,7 @@ const { executeCode } = require("../services/judge.service");
       }
 
       /* ---------- RESPONSE ---------- */
+      logger.success("Code execution completed successfully");
       return res.json({
         submissionId: submission?._id || null,
         verdict: result.verdict,
@@ -90,6 +96,7 @@ const { executeCode } = require("../services/judge.service");
       });
 
     } catch (err) {
+      logger.error("runCodeController failed: " + err.message);
       console.error("RUN CODE ERROR:", err);
 
       return res.status(500).json({

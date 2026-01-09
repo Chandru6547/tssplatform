@@ -1,12 +1,15 @@
 const Submission = require("../models/Submission");
 const getQuestionTitleById = require("./question.controller").getQuestionTitleById;
 const User = require("../models/User");
+const logger = require("../utils/logger");
 
 exports.checkSolvedStatus = async (req, res) => {
+  logger.info("checkSolvedStatus API called");
   const studentId = req.user.userId;
   const { questionId } = req.query;
 
   if (!questionId) {
+    logger.error("questionId is required in checkSolvedStatus");
     return res.status(400).json({ message: "questionId is required" });
   }
 
@@ -17,19 +20,23 @@ exports.checkSolvedStatus = async (req, res) => {
       verdict: "AC"
     });
     
+    logger.success("Solved status checked successfully");
     res.json({
       solved: !!solved
     });
   } catch (err) {   
+    logger.error("Error in checkSolvedStatus: " + err.message);
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
 exports.getSubmissionsByBatch = async (req, res) => {
+  logger.info("getSubmissionsByBatch API called");
   const { college, year, batch } = req.body;
 
   if (!college || !year || !batch) {
+    logger.error("college, year, and batch are required in getSubmissionsByBatch");
     return res.status(400).json({
       message: "college, year, and batch are required"
     });
@@ -44,6 +51,7 @@ exports.getSubmissionsByBatch = async (req, res) => {
     }).lean();
 
     if (submissions.length === 0) {
+      logger.success("No submissions found for the batch");
       return res.json([]);
     }
 
@@ -107,9 +115,11 @@ exports.getSubmissionsByBatch = async (req, res) => {
       studentSolvedCount: solvedCountMap[sub.studentId] || 0
     }));
 
+    logger.success("Submissions by batch retrieved successfully");
     res.json(enrichedSubmissions);
 
   } catch (err) {
+    logger.error("Error in getSubmissionsByBatch: " + err.message);
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }

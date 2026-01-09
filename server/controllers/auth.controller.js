@@ -1,11 +1,13 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const logger = require("../utils/logger");
 
 /**
  * Register (use once to create admin)
  */
 exports.register = async (req, res) => {
+  logger.info("Register API called");
   try {
     const {
       email,
@@ -21,6 +23,7 @@ exports.register = async (req, res) => {
 
     /* ---------- BASIC CHECK ---------- */
     if (!email || !password) {
+      logger.error("Register failed: Email and password are required");
       return res.status(400).json({
         message: "Email and password are required"
       });
@@ -29,6 +32,7 @@ exports.register = async (req, res) => {
     /* ---------- STUDENT VALIDATION ---------- */
     if (role === "student") {
       if (!name || !college || !year || !batch) {
+        logger.error("Register failed: Student validation failed");
         return res.status(400).json({
           message:
             "Student must have name, college, year, and batch"
@@ -39,6 +43,7 @@ exports.register = async (req, res) => {
     /* ---------- CHECK EXISTING USER ---------- */
     const exists = await User.findOne({ email });
     if (exists) {
+      logger.error("Register failed: User already exists");
       return res.status(400).json({
         message: "User already exists"
       });
@@ -66,12 +71,14 @@ exports.register = async (req, res) => {
       phNo
     });
 
+    logger.success("User registered successfully");
     res.status(201).json({
       message: "User registered successfully",
       userId: user._id,
       role: user.role
     });
   } catch (err) {
+    logger.error(`Register failed: ${err.message}`);
     console.error(err);
     res.status(500).json({
       message: "Server error"
@@ -82,6 +89,7 @@ exports.register = async (req, res) => {
  * Login (Admin + Student)
  */
 exports.login = async (req, res) => {
+  logger.info("Login API called");
   const { email, password } = req.body;
   try {
     // 🔍 Fetch user from DB
@@ -91,12 +99,14 @@ exports.login = async (req, res) => {
     console.log(user);
     
     if (!user) {
+      logger.error("Login failed: Invalid email or password");
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
     // 🔐 Compare password
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
+      logger.error("Login failed: Invalid email or password");
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
@@ -111,12 +121,14 @@ exports.login = async (req, res) => {
     );
 
     // ✅ SEND userId ALSO
+    logger.success("Login successful");
     res.json({
       token,
       role: user.role,
       userId: user._id
     });
   } catch (err) {
+    logger.error(`Login failed: ${err.message}`);
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }

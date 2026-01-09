@@ -1,19 +1,23 @@
 const MCQ = require("../models/MCQ");
 const MCQSubmission = require("../models/MCQSubmission");
 const User = require("../models/User");
+const logger = require("../utils/logger");
 
 /* ---------- SUBMIT MCQ ---------- */
 exports.submitMCQ = async (req, res) => {
+  logger.info("submitMCQ API called");
   try {
     const { mcqId, studentId, answers } = req.body;
 
     const mcq = await MCQ.findById(mcqId);
     if (!mcq) {
+      logger.error("MCQ not found in submitMCQ");
       return res.status(404).json({ message: "MCQ not found" });
     }
 
     const student = await User.findById(studentId);
     if (!student) {
+      logger.error("Student not found in submitMCQ");
       return res.status(404).json({ message: "Student not found" });
     }
 
@@ -53,49 +57,59 @@ exports.submitMCQ = async (req, res) => {
       answers: evaluatedAnswers
     });
 
+    logger.success("MCQ submitted successfully");
     res.status(201).json({
       message: "MCQ submitted successfully",
       submission
     });
   } catch (err) {
+    logger.error("Error in submitMCQ: " + err.message);
     res.status(500).json({ error: err.message });
   }
 };
 
 /* ---------- GET SUBMISSIONS BY STUDENT ---------- */
 exports.getMCQSubmissionsByStudent = async (req, res) => {
+  logger.info("getMCQSubmissionsByStudent API called");
   try {
     const { studentId } = req.params;
 
     const submissions = await MCQSubmission.find({ studentId })
       .populate("mcqId", "topic category");
 
+    logger.success("MCQ submissions by student retrieved successfully");
     res.json(submissions);
   } catch (err) {
+    logger.error("Error in getMCQSubmissionsByStudent: " + err.message);
     res.status(500).json({ error: err.message });
   }
 };
 
 /* ---------- GET SUBMISSIONS BY MCQ ---------- */
 exports.getMCQSubmissionsByMCQ = async (req, res) => {
+  logger.info("getMCQSubmissionsByMCQ API called");
   try {
     const { mcqId } = req.params;
 
     const submissions = await MCQSubmission.find({ mcqId })
       .populate("studentId", "name email");
 
+    logger.success("MCQ submissions by MCQ retrieved successfully");
     res.json(submissions);
   } catch (err) {
+    logger.error("Error in getMCQSubmissionsByMCQ: " + err.message);
     res.status(500).json({ error: err.message });
   }
 };
 
 
 exports.getMCQSubmissionbyBatch = async (req, res) => {
+  logger.info("getMCQSubmissionbyBatch API called");
   const { college, year, batch, mcqId } = req.body;
   console.log(req.body);
   
   if (!college || !year || !batch) {
+    logger.error("college, year, and batch are required in getMCQSubmissionbyBatch");
     return res.status(400).json({
       message: "college, year, and batch are required"
     });
@@ -111,6 +125,7 @@ exports.getMCQSubmissionbyBatch = async (req, res) => {
     }).lean();
 
     if (allSubmissions.length === 0) {
+      logger.success("No submissions found for the batch");
       return res.json([]);
     }
 
@@ -182,9 +197,11 @@ exports.getMCQSubmissionbyBatch = async (req, res) => {
       studentAttemptedCount: attemptedCountMap[sub.studentId] || 0
     }));
 
+    logger.success("MCQ submissions by batch retrieved successfully");
     res.json(enrichedSubmissions);
 
   } catch (err) {
+    logger.error("Error in getMCQSubmissionbyBatch: " + err.message);
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
