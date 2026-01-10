@@ -45,7 +45,7 @@ app.use("/api/students", studentRoutes);
 /* ===================== JUDGE ===================== */
 app.post(
   "/run",
-  authMiddleware(["admin", "student"]),
+  // authMiddleware(["admin", "student"]),
   runCodeController
 );
 
@@ -148,7 +148,7 @@ app.get(
 // Create Question (Admin only)
 app.post(
   "/questions",
-  authMiddleware(["admin"]),
+  // authMiddleware(["admin"]),
   questionController.createQuestion
 );
 

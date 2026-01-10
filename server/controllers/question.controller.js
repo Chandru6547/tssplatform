@@ -5,6 +5,8 @@ const logger = require("../utils/logger");
 exports.createQuestion = async (req, res) => {
   logger.info("createQuestion API called");
   try {
+    console.log(req.body);
+    
     const question = await Question.create(req.body);
     logger.success("Question created successfully");
     res.status(201).json(question);
@@ -13,7 +15,7 @@ exports.createQuestion = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
+ 
 // LIST BY CATEGORY
 exports.getQuestionsByCategory = async (req, res) => {
   logger.info("getQuestionsByCategory API called");
