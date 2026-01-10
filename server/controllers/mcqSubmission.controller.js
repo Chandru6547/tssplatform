@@ -102,6 +102,33 @@ exports.getMCQSubmissionsByMCQ = async (req, res) => {
   }
 };
 
+/* ---------- GET SUBMISSION BY STUDENT & MCQ ---------- */
+exports.getMCQSubmissionByStudentAndMcq = async (req, res) => {
+  logger.info("getMCQSubmissionByStudentAndMcq API called");
+  try {
+    const { studentId, mcqId } = req.params;
+
+    if (!studentId || !mcqId) {
+      logger.error("studentId and mcqId are required in getMCQSubmissionByStudentAndMcq");
+      return res.status(400).json({ message: "studentId and mcqId are required" });
+    }
+
+    const submissions = await MCQSubmission.find({ studentId, mcqId }).sort({ createdAt: -1 });
+
+    if (!submissions || submissions.length === 0) {
+      logger.info("No submissions found for given student and mcq");
+      return res.json([]);
+    }
+
+    logger.success("Submissions for student and MCQ retrieved successfully");
+    res.json(submissions);
+  } catch (err) {
+    logger.error("Error in getMCQSubmissionByStudentAndMcq: " + err.message);
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+ 
 
 exports.getMCQSubmissionbyBatch = async (req, res) => {
   logger.info("getMCQSubmissionbyBatch API called");
@@ -158,7 +185,7 @@ exports.getMCQSubmissionbyBatch = async (req, res) => {
     /* ---------- 3️⃣ CALCULATE MCQ ATTEMPTED COUNT (DISTINCT) ---------- */
     const attemptedMap = {};
 
-    submissions.forEach(sub => {
+    submissions.forEach(sub => { 
       if (!attemptedMap[sub.studentId]) {
         attemptedMap[sub.studentId] = new Set();
       }
