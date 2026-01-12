@@ -26,6 +26,11 @@ const mcqSubmissionRoutes = require("./routes/mcqSubmission.routes");
 const addCourse = require("./controllers/userCourse.controller").addCourse;
 const addMcq = require("./controllers/userMcq.controller").addMcq;
 const getAllMCQForAdmin =require("./controllers/mcq.controller").getAllMCQsforAdmin;
+const assignmentRoutes = require("./routes/assignment.routes");
+const assignmentSubmissionRoutes = require(
+  "./routes/assignmentSubmission.routes"
+);
+const assignmentController = require("./controllers/assignment.controller"); 
 require("dotenv").config();
 
 const app = express();
@@ -36,8 +41,10 @@ app.use(cors());
 connectDB();
 
 app.use("/api/submissions", require("./routes/submissionRoutes"));
+app.use("/api/assignment-submissions", assignmentSubmissionRoutes);
 app.use("/api/mcqs", mcqRoutes);
 app.use("/api/mcq-submissions", mcqSubmissionRoutes);
+app.use("/api/assignments", assignmentRoutes);
 /* ===================== AUTH ===================== */
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
@@ -52,6 +59,11 @@ app.post(
 app.post(
   "/campus",
   campusController.createCampus
+);
+
+app.post(
+  "/get-assignments-for-student",
+  assignmentController.getAssignmentforStudent
 );
 
 app.get(
@@ -152,10 +164,12 @@ app.post(
   questionController.createQuestion
 );
 
+app.get("/questionsforadmin", questionController.getAllQuestionsforAdmin);
+
 // Get Questions by Category
 app.get(
   "/questions",
-   authMiddleware(["admin", "student"]),
+  //  authMiddleware(["admin", "student"]),
   questionController.getQuestionsByCategory
 );
 

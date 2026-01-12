@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
   batch : String,
   course: [],
   mcqs: [],
+  assignments: [],
   regNo: String,
   phNo: String,
   role: {

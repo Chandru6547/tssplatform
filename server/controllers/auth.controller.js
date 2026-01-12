@@ -93,7 +93,7 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
     // 🔍 Fetch user from DB
-    console.log("dshasjfbdsj");
+    // console.log("dshasjfbdsj");
     
     const user = await User.findOne({ email });
     console.log(user);

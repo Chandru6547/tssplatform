@@ -15,6 +15,18 @@ exports.createQuestion = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getAllQuestionsforAdmin= async (req, res) => {
+  logger.info("getAllQuestionsforAdmin API called");
+  try {
+    const questions = await Question.find();
+    logger.success("All Questions for admin retrieved successfully");
+    res.json(questions);
+  } catch (err) {
+    logger.error("Error in getAllQuestionsforAdmin: " + err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
  
 // LIST BY CATEGORY
 exports.getQuestionsByCategory = async (req, res) => {

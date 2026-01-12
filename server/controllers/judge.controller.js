@@ -20,6 +20,11 @@ const logger = require("../utils/logger");
         studentId
       } = req.body;
 
+      let assignmentId = req.body.assignmentId;
+
+      console.log(req.body);
+      
+
       /* ---------- BASIC VALIDATION ---------- */
       if (!language || !code) {
         logger.error("runCodeController failed: language and code are required");

@@ -16,6 +16,8 @@ module.exports.getUser = async (req, res) => {
   }
 }
 
+
+
 module.exports.getStudentName = async (studentId) => {
   if (!studentId) return null; 
     const student = await User.findById(studentId).select("name");
@@ -38,3 +40,5 @@ module.exports.getStudentsByCollegeYearBatch = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 }
+
+module.exports.getStudentsByCollegeYearBatch
