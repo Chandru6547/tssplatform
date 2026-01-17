@@ -5,13 +5,16 @@ const Assignment = require("../models/Assignment");
 /* ---------------- SUBMIT ASSIGNMENT ---------------- */
 exports.submitAssignment = async (req, res) => {
   try {
-    const { assignmentId, studentId, solvedQuestions } = req.body;
+    console.log(req.body);
+    const { assignmentId, studentId, solvedQuestions, isFinalSubmisison } = req.body;
 
     if (!assignmentId || !studentId) {
       return res.status(400).json({
         message: "assignmentId and studentId are required"
       });
     }
+
+    const isCompleted = isFinalSubmisison ? true : false;
 
     /* ---------- FETCH STUDENT ---------- */
     const student = await User.findById(studentId);
@@ -43,7 +46,8 @@ exports.submitAssignment = async (req, res) => {
         rollNo: student.regNo,
         batch: student.batch,
         solvedQuestions: solvedQuestions || [],
-        problemsSolved
+        problemsSolved,
+        isCompleted
       },
       { new: true, upsert: true }
     );
@@ -79,6 +83,9 @@ exports.getSubmissionByStudent = async (req, res) => {
       assignmentId: req.params.assignmentId,
       studentId: req.params.studentId
     }).populate("solvedQuestions", "title difficulty");
+
+    console.log(submission);
+    
 
     if (!submission) {
       return res.status(404).json({

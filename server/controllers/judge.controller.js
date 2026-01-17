@@ -17,7 +17,8 @@ const logger = require("../utils/logger");
         code,
         testcases,
         questionId,
-        studentId
+        studentId,
+        isRunAlone,
       } = req.body;
 
       let assignmentId = req.body.assignmentId;

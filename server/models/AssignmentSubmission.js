@@ -29,6 +29,11 @@ const assignmentSubmissionSchema = new mongoose.Schema(
       required: true
     },
 
+    isCompleted: {
+      type: Boolean,
+      default: false
+    },
+
     problemsSolved: {
       type: Number,
       default: 0
@@ -41,6 +46,7 @@ const assignmentSubmissionSchema = new mongoose.Schema(
       }
     ]
   },
+    
   { timestamps: true }
 );
 

@@ -34,3 +34,31 @@ exports.addCourse = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.addAssignment = async (req, res) => {
+  logger.info("addAssignment API called");
+  const { email, assignmentId } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      logger.error("User not found in addAssignment");
+      return res.status(404).json({ message: "User not found" });
+    }
+    // prevent duplicate
+    if (user.assignments.includes(assignmentId)) {
+      logger.error("Assignment already exists in addAssignment");
+      return res.status(400).json({ message: "Assignment already exists" });
+    }
+    user.assignments.push(assignmentId);
+    await user.save();
+    logger.success("Assignment added successfully");
+    res.json({
+      message: "Assignment added successfully",
+      assignments: user.assignments
+    });
+  } catch (err) {
+    logger.error("Error in addAssignment: " + err.message);
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

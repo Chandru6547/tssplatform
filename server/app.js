@@ -31,6 +31,8 @@ const assignmentSubmissionRoutes = require(
   "./routes/assignmentSubmission.routes"
 );
 const assignmentController = require("./controllers/assignment.controller"); 
+const userCourseController = require("./controllers/userCourse.controller");
+const tickerRoutes = require("./routes/ticket.routes");
 require("dotenv").config();
 
 const app = express();
@@ -45,6 +47,7 @@ app.use("/api/assignment-submissions", assignmentSubmissionRoutes);
 app.use("/api/mcqs", mcqRoutes);
 app.use("/api/mcq-submissions", mcqSubmissionRoutes);
 app.use("/api/assignments", assignmentRoutes);
+app.use("/api/tickets", tickerRoutes);
 /* ===================== AUTH ===================== */
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
@@ -65,6 +68,8 @@ app.post(
   "/get-assignments-for-student",
   assignmentController.getAssignmentforStudent
 );
+
+app.post('/addAssignmentToUser', userCourseController.addAssignment);
 
 app.get(
   "/campus/get",
