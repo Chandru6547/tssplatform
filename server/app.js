@@ -33,6 +33,7 @@ const assignmentSubmissionRoutes = require(
 const assignmentController = require("./controllers/assignment.controller"); 
 const userCourseController = require("./controllers/userCourse.controller");
 const tickerRoutes = require("./routes/ticket.routes");
+const judgeController = require("./controllers/judge.controller");
 require("dotenv").config();
 
 const app = express();
@@ -48,6 +49,7 @@ app.use("/api/mcqs", mcqRoutes);
 app.use("/api/mcq-submissions", mcqSubmissionRoutes);
 app.use("/api/assignments", assignmentRoutes);
 app.use("/api/tickets", tickerRoutes);
+
 /* ===================== AUTH ===================== */
 app.use("/api/auth", authRoutes);
 app.use("/api/students", studentRoutes);
@@ -75,6 +77,8 @@ app.get(
   "/campus/get",
   campusController.getCampuses
 );
+
+app.post('/run-code-alone',judgeController.runOnlyCompilerController);
 
 app.post(
   "/year",

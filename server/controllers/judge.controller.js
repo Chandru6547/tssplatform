@@ -5,6 +5,8 @@ const Question = require("../models/Question");
 const User = require("../models/User");
 const { executeCode } = require("../services/judge.service");
 const logger = require("../utils/logger");
+const executeCodeRaw = require("../services/executeCodeRaw.service");
+
 
 /* ---------------------------------------------
    RUN / SUBMIT CODE CONTROLLER
@@ -112,6 +114,46 @@ const logger = require("../utils/logger");
     }
   }
 
+  async function runOnlyCompilerController(req, res) {
+    logger.info("runOnlyCompilerController API called");
+
+    try {
+      const { language, code, input = "" } = req.body;
+
+      /* ---------- BASIC VALIDATION ---------- */
+      if (!language || !code) {
+        logger.error("runOnlyCompilerController failed: language and code required");
+        return res.status(400).json({
+          error: "language and code are required"
+        });
+      }
+
+      /* ---------- EXECUTE CODE ---------- */
+      const executionResult = await executeCodeRaw.executeCodeRaw(
+        language,
+        code,
+        input
+      );
+
+      logger.success("Compiler run executed successfully");
+
+      /* ---------- RESPONSE ---------- */
+      return res.json({
+        output: executionResult.output || "",
+        error: executionResult.error || null,
+        time: executionResult.time || null
+      });
+
+    } catch (err) {
+      logger.error("runOnlyCompilerController failed: " + err.message);
+      console.error("COMPILER RUN ERROR:", err);
+
+      return res.status(500).json({
+        error: err.message || "Internal Server Error"
+      });
+    }
+  }
+
 async function getStudentDetails(studentId) {
   if (!studentId) return null;
 
@@ -129,5 +171,6 @@ async function getStudentDetails(studentId) {
 
 module.exports = {
   runCodeController,
-  getStudentDetails
+  getStudentDetails,
+  runOnlyCompilerController
 };
