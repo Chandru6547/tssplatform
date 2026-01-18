@@ -31,6 +31,22 @@ exports.checkSolvedStatus = async (req, res) => {
   }
 };
 
+exports.getSubmissionByStudent = async (req, res) => {
+  logger.info("getSubmissionByStudent API called");
+  const studentId = req.body.studentId;
+
+  try {
+    const submissions = await Submission.find({ studentId }).lean();
+
+    logger.success("Submissions retrieved successfully");
+    res.json(submissions);
+  } catch (err) {
+    logger.error("Error in getSubmissionByStudent: " + err.message);
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 exports.getSubmissionsByBatch = async (req, res) => {
   logger.info("getSubmissionsByBatch API called");
   const { college, year, batch } = req.body;

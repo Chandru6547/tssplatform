@@ -121,6 +121,7 @@ app.get(
 );
 
 app.post('/getStudentDetails', studentController.getUser);
+app.post('/getStudentByEmail', studentController.getStudentByEmail);
 
 app.post('/getSubmissionsByBatch', getSubmissionsByBatch);
 
