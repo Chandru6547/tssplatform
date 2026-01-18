@@ -16,7 +16,20 @@ module.exports.getUser = async (req, res) => {
   }
 }
 
+module.exports.getStudentByEmail = async(req, res) => {
+  const { email } = req.body;
 
+  try {
+    const student = await User.findOne({ email, role: "student" }).select("-password");
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+    res.json(student);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+}
 
 module.exports.getStudentName = async (studentId) => {
   if (!studentId) return null; 
