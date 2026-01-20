@@ -15,4 +15,8 @@ router.post(
   // auth(["admin"]), // only admin/super admin
   adminController.createStudent
 );
+
+router.post('/filternotcreated', adminController.findNotCreatedStudents);
+router.post('/bulkcreatestudent', adminController.bulkCreateStudents);
+router.post('/bulkdeletestudents', adminController.bulkDeleteStudentsByEmail);
 module.exports = router;

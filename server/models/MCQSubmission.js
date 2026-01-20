@@ -3,21 +3,21 @@ const mongoose = require("mongoose");
 const MCQAnswerSchema = new mongoose.Schema({
   questionId: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    required: false
   },
   selectedOption: {
     type: String,
     enum: ["A", "B", "C", "D"],
-    required: true
+    required: false
   },
   correctOption: {
     type: String,
     enum: ["A", "B", "C", "D"],
-    required: true
+    required: false
   },
   isCorrect: {
     type: Boolean,
-    required: true
+    required: false
   },
   mark: {
     type: Number,
@@ -29,14 +29,14 @@ const MCQSubmissionSchema = new mongoose.Schema({
   mcqId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "MCQ",
-    required: true
+    required: false
   },
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true
+    required: false
   },
-
+  isTabSwitch : Boolean,
   score: Number,
   totalMarks: Number,
   college: String,

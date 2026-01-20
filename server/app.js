@@ -20,7 +20,7 @@ const campusController = require("./controllers/campus.controller");
 const yearController = require("./controllers/year.controller");
 const batchController = require("./controllers/batch.controller");
 const studentController = require("./controllers/student.controller");
-const { getSubmissionsByBatch } = require("./controllers/submissionController");
+const { getSubmissionsByBatch, getSubmissionByStudent } = require("./controllers/submissionController");
 const mcqRoutes = require("./routes/mcq.routes");
 const mcqSubmissionRoutes = require("./routes/mcqSubmission.routes");
 const addCourse = require("./controllers/userCourse.controller").addCourse;
@@ -124,6 +124,7 @@ app.post('/getStudentDetails', studentController.getUser);
 app.post('/getStudentByEmail', studentController.getStudentByEmail);
 
 app.post('/getSubmissionsByBatch', getSubmissionsByBatch);
+app.post('/getSubmissionByStudent', getSubmissionByStudent);
 
 
 /* ===================== ADMIN ===================== */
@@ -139,7 +140,7 @@ app.post(
 
 app.get(
   "/courses",
-  authMiddleware(["admin", "student"]),
+  // authMiddleware(["admin", "student"]),
   courseController.getCourses
 );
 

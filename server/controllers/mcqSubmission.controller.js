@@ -9,6 +9,9 @@ exports.submitMCQ = async (req, res) => {
   try {
     const { mcqId, studentId, answers } = req.body;
 
+    console.log(req.body);
+    
+
     const mcq = await MCQ.findById(mcqId);
     if (!mcq) {
       logger.error("MCQ not found in submitMCQ");
@@ -54,7 +57,9 @@ exports.submitMCQ = async (req, res) => {
       college: student.college,
       year: student.year,
       batch: student.batch,
-      answers: evaluatedAnswers
+      answers: evaluatedAnswers,
+      isTabSwitch : req.body.forcedSubmit
+
     });
 
     logger.success("MCQ submitted successfully");
