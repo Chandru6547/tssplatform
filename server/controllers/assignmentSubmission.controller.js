@@ -100,3 +100,20 @@ exports.getSubmissionByStudent = async (req, res) => {
     });
   }
 };
+
+exports.getSubmissionByBatch = async (req, res) => {
+  try {
+    const { assignmentId, batch, college, year } = req.body;
+    const submissions = await AssignmentSubmission.find({
+      assignmentId,
+      batch,
+      college,
+      year
+    }).sort({ problemsSolved: -1 });
+    res.json(submissions);
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to fetch submissions by batch"
+    });
+  }
+};

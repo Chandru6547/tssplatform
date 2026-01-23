@@ -19,6 +19,9 @@ const assignmentSubmissionSchema = new mongoose.Schema(
       required: true
     },
 
+    college : String,
+    year : Number,
+
     rollNo: {
       type: String,
       required: true

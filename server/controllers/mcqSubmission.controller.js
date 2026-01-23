@@ -134,6 +134,27 @@ exports.getMCQSubmissionByStudentAndMcq = async (req, res) => {
   }
 };
  
+exports.getSubmissionForStudentAndMcq = async (req, res) => {
+  logger.info("getMCQSubmissionByStudentAndMcq API called");
+  try {
+    const { studentId, mcqId } = req.body;  
+    if (!studentId || !mcqId) {
+      logger.error("studentId and mcqId are required in getMCQSubmissionByStudentAndMcq");
+      return res.status(400).json({ message: "studentId and mcqId are required" });
+    } 
+    const submissions = await MCQSubmission.find({ studentId, mcqId }).sort({ createdAt: -1 });
+    if (!submissions || submissions.length === 0) {
+      logger.info("No submissions found for given student and mcq");
+      return res.json([]);
+    }
+    logger.success("Submissions for student and MCQ retrieved successfully");
+    res.json(submissions);
+  } catch (err) {
+    logger.error("Error in getMCQSubmissionByStudentAndMcq: " + err.message);
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  } 
+};
 
 exports.getMCQSubmissionbyBatch = async (req, res) => {
   logger.info("getMCQSubmissionbyBatch API called");

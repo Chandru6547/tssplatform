@@ -58,8 +58,6 @@ exports.getMcqsForStudent = async (req, res) => {
       logger.error("Student not found in getMcqsForStudent");
       return res.status(404).json({ message: "Student not found" });
     }
-
-    console.log(student);
     
     const mcqIds = student.mcqs || [];
 
@@ -71,6 +69,29 @@ exports.getMcqsForStudent = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+  exports.getMcqsDetailForStudent = async (req, res) => {
+    logger.info("getMcqsDetailForStudent API called");
+    try {
+      const { studentId } = req.body;
+      console.log(studentId);
+
+      const Student = require("../models/User");
+      
+      const student = await Student.findById(studentId);
+      if (!student) {
+        logger.error("Student not found in getMcqsDetailForStudent");
+        return res.status(404).json({ message: "Student not found" });
+      }
+      const mcqIds = student.mcqs || [];
+      const mcqs = await MCQ.find({ _id: { $in: mcqIds } });
+      logger.success("MCQs details for student retrieved successfully");
+      res.json(mcqs);
+    } catch (err) {
+      logger.error("Error in getMcqsDetailForStudent: " + err.message);
+      res.status(500).json({ error: err.message });
+    }
+  };
 
 exports.getMCQByID = async (req, res) => {
   logger.info("getMCQByID API called");
