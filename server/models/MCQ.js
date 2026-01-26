@@ -52,7 +52,8 @@ const MCQSchema = new mongoose.Schema(
       required: true
     }
   },
-  { timestamps: true }
+  { timestamps: true },
+  { duration: Number } // duration in minutes
 );
 
 module.exports = mongoose.model("MCQ", MCQSchema);

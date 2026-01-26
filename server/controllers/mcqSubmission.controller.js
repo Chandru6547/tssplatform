@@ -24,6 +24,9 @@ exports.submitMCQ = async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
+    console.log(student);
+    
+
     let score = 0;
     let totalMarks = 0;
     const evaluatedAnswers = [];
@@ -35,7 +38,7 @@ exports.submitMCQ = async (req, res) => {
 
       totalMarks += q.mark || 1;
 
-      if (!studentAnswer) return;
+      if (!studentAnswer) return; 
 
       const isCorrect = studentAnswer.selectedOption === q.correctOption;
       if (isCorrect) score += q.mark || 1;
@@ -203,6 +206,8 @@ exports.getMCQSubmissionbyBatch = async (req, res) => {
       .select("email name")
       .lean();
 
+      console.log(students);
+
     const studentMap = {};
     students.forEach(s => {
       studentMap[s._id.toString()] = s;
@@ -251,6 +256,7 @@ exports.getMCQSubmissionbyBatch = async (req, res) => {
     }));
 
     logger.success("MCQ submissions by batch retrieved successfully");
+    console.log(enrichedSubmissions);
     res.json(enrichedSubmissions);
 
   } catch (err) {

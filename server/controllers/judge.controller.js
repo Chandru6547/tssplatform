@@ -135,6 +135,8 @@ const executeCodeRaw = require("../services/executeCodeRaw.service");
         input
       );
 
+      console.log(executionResult); 
+
       logger.success("Compiler run executed successfully");
 
       /* ---------- RESPONSE ---------- */

@@ -7,6 +7,8 @@ exports.createMCQ = async (req, res) => {
   logger.info("createMCQ API called");
   try {
     const mcq = await MCQ.create(req.body);
+    console.log(mcq);
+    
     logger.success("MCQ created successfully");
     res.status(201).json(mcq);
   } catch (err) {
