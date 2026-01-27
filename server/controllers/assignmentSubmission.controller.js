@@ -117,3 +117,23 @@ exports.getSubmissionByBatch = async (req, res) => {
     });
   }
 };
+
+exports.getSubmissionByCollegeAndAssignment = async (req, res) => {
+  try {
+    const { assignmentId, college } = req.body;
+    const student = await User.find({ college, role: "student" });
+    const studentIds = student.map((stu) => stu._id);
+
+    const submissions = await AssignmentSubmission.find({
+      assignmentId,
+      studentId: { $in: studentIds }
+    }).sort({ problemsSolved: -1 });
+    
+    res.json(submissions);
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to fetch submissions by college and assignment"
+    });
+  }
+};
+

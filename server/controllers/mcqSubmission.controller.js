@@ -265,3 +265,41 @@ exports.getMCQSubmissionbyBatch = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.getSubmissionByCollegeAndMcq = async (req, res) => {
+  logger.info("getSubmissionByCollegeAndMcq API called");
+  try {
+    const { college, mcqId } = req.body;
+
+    if (!college || !mcqId) {
+      logger.error("college and mcqId are required in getSubmissionByCollegeAndMcq");
+      return res.status(400).json({ message: "college and mcqId are required" });
+    }
+
+    // 1️⃣ Get all students from the college
+    const students = await User.find(
+      { college, role: "student" },
+      { password: 0 }
+    );
+
+    logger.info(`Found ${students.length} students in college ${college}`);
+
+    const studentIds = students.map(s => s._id);
+
+    // 2️⃣ Get all MCQ submissions for those students
+    const submissions = await MCQSubmission.find({
+      mcqId,
+      studentId: { $in: studentIds }
+    })
+      .populate("studentId", "name email regNo batch year")
+      .sort({ score: -1, createdAt: 1 }); // leaderboard style
+
+    res.json(submissions);
+
+  } catch (err) {
+    logger.error("Failed to fetch MCQ submissions by college", err);
+    res.status(500).json({
+      message: "Failed to fetch MCQ submissions by college"
+    });
+  }
+};

@@ -21,7 +21,8 @@ const authController = require("./controllers/auth.controller");
 const judgeController = require("./controllers/judge.controller");
 const ticketController = require("./controllers/ticket.controller");
 const authMiddleware = require("./middleware/auth.middleware");
-
+const curriculumController = require("./controllers/curriculum.controller");
+const staffController = require("./controllers/staff.controller");
 require("dotenv").config();
 
 const app = express();
@@ -40,6 +41,7 @@ app.post("/api/assignment-submissions/submit", assignmentSubmissionController.su
 app.get("/api/assignment-submissions/assignment/:assignmentId", assignmentSubmissionController.getSubmissionsByAssignment);
 app.post("/api/assignment-submissions/getReportByBatch", assignmentSubmissionController.getSubmissionByBatch);
 app.get("/api/assignment-submissions/assignment/:assignmentId/student/:studentId", assignmentSubmissionController.getSubmissionByStudent);
+app.post("/api/assignment-submissions/getSubmissionByCollegeAndAssignment", assignmentSubmissionController.getSubmissionByCollegeAndAssignment);
 
 /* ===================== MCQS ===================== */
 app.post("/api/mcqs/createmcq", mcqController.createMCQ);
@@ -60,6 +62,8 @@ app.get("/api/mcq-submissions/mcq/:mcqId", mcqSubmissionController.getMCQSubmiss
 app.get("/api/mcq-submissions/student/:studentId/mcq/:mcqId", mcqSubmissionController.getMCQSubmissionByStudentAndMcq);
 app.post("/api/mcq-submissions/getreporbytbatch", mcqSubmissionController.getMCQSubmissionbyBatch);
 app.post("/api/mcq-submissions/getSubmissionForStudentAndMcq", mcqSubmissionController.getSubmissionForStudentAndMcq);
+app.post("/api/mcq-submissions/getSubmissionByCollegeAndMcq", mcqSubmissionController.getSubmissionByCollegeAndMcq);
+
 
 /* ===================== ASSIGNMENTS ===================== */
 app.post("/api/assignments", assignmentController.createAssignment);
@@ -88,6 +92,7 @@ app.post("/getStudentByEmail", studentController.getStudentByEmail);
 
 /* ===================== ADMIN ===================== */
 app.post("/api/admin/create", adminController.createAdmin);
+app.post("/api/admin/create-staff", adminController.createStaff);
 app.post("/api/admin/create-student", adminController.createStudent);
 app.post("/api/admin/filternotcreated", adminController.findNotCreatedStudents);
 app.post("/api/admin/bulkcreatestudent", adminController.bulkCreateStudents);
@@ -131,6 +136,21 @@ app.get("/questions", questionController.getQuestionsByCategory);
 app.get("/questions/:id", authMiddleware(["admin", "student"]), questionController.getQuestionById);
 app.get("/questionsforadmin/:id", questionController.getQuestionByIdforAdmin);
 app.put("/questions/:id", questionController.updateQuestion);
+
+/*=========================CURRICULUM=========================*/
+app.post("/api/curriculum/addCourse", curriculumController.addCourse);
+app.post("/api/curriculum/addMCQ", curriculumController.addMCQ);
+app.post("/api/curriculum/addAssignment", curriculumController.addAssignment);
+app.post("/api/curriculum/getCourses", curriculumController.getCourses);
+app.post("/api/curriculum/getMCQs", curriculumController.getMCQs);
+app.post("/api/curriculum/getAssignments", curriculumController.getAssignments);
+
+
+/*=====================STAFF========================*/
+app.post("/api/staff/addAssignment", staffController.addAssignmenttoStaff);
+app.post("/api/staff/addCourse", staffController.addCoursetoStaff);
+app.post("/api/staff/addMcq", staffController.addMcqtoStaff);
+app.get("/api/getStaffById/:id", staffController.getStaffById);
 
 /* ===================== SERVER ===================== */
 const PORT = process.env.PORT;

@@ -3,8 +3,6 @@ const path = require("path");
 const { exec } = require("child_process");
 
 async function executeCodeRaw(language, code, input) {
-  console.log("ds dgvbasjbcjdsbckjdsbcjdsb ");
-  
   return new Promise((resolve) => {
     const tempDir = path.join(__dirname, "../temp");
     if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);

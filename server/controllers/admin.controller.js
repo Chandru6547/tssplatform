@@ -78,6 +78,36 @@ exports.createAdmin = async (req, res) => {
   }
 };
 
+exports.createStaff = async (req, res) => {
+  logger.info("createStaff API called");
+  const { email } = req.body;
+
+  try {
+    const exists = await User.findOne({ email });
+    if (exists) {
+      return res.status(400).json({ message: "Admin already exists" });
+    }
+
+    // 🔐 Generate temp password
+    const tempPassword = crypto.randomBytes(4).toString("hex");
+    logger.info("Temporary password generated: " + tempPassword);
+    
+    const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+    await User.create({
+      email,
+      password: hashedPassword,
+      role: "staff"
+    });
+
+    logger.success("Staff created and email sent successfully");
+    res.json({ message: "Staff created & email sent" });
+  } catch (err) {
+    logger.error("Error in createStaff: " + err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 exports.createStudent = async (req, res) => {
   logger.info("createStudent API called");
 
