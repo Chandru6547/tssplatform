@@ -23,7 +23,6 @@ exports.submitMCQ = async (req, res) => {
       logger.error("Student not found in submitMCQ");
       return res.status(404).json({ message: "Student not found" });
     }
-
     console.log(student);
     
 
@@ -61,8 +60,8 @@ exports.submitMCQ = async (req, res) => {
       year: student.year,
       batch: student.batch,
       answers: evaluatedAnswers,
-      isTabSwitch : req.body.forcedSubmit
-
+      isTabSwitch : req.body.forcedSubmit,
+      StudentName : student.name
     });
 
     logger.success("MCQ submitted successfully");

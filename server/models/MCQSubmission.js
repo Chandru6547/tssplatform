@@ -36,6 +36,7 @@ const MCQSubmissionSchema = new mongoose.Schema({
     ref: "User",
     required: false
   },
+  StudentName : String,
   isTabSwitch : Boolean,
   score: Number,
   totalMarks: Number,
